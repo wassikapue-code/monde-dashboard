@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monde Eyewear — Facebook Ads Dashboard v2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand:#F26522;--brand-light:#FDE8D8;--brand-dark:#C44D10;
+    --ink:#1A1412;--ink-2:#4A3F3A;--ink-3:#8A7A74;
+    --surface:#FDFAF8;--surface-2:#F5EDE7;--surface-3:#EDE0D8;
+    --border:#E2D5CC;
+    --green:#2D8A5E;--green-light:#D4EDE3;
+    --red:#C04040;--red-light:#F5DADA;
+    --blue:#3A6EA8;--blue-light:#D6E5F5;
+    --amber:#C07820;--amber-light:#F5E6C8;
+    --purple:#6B4E9B;--purple-light:#EAE3F5;
+    --teal:#1E7E78;--teal-light:#D2EDEC;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);font-size:13px;line-height:1.5;}
+
+  .header{background:var(--ink);padding:20px 28px 18px;display:flex;align-items:center;gap:16px;border-bottom:3px solid var(--brand);}
+  .header-logo{width:36px;height:36px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:#fff;flex-shrink:0;}
+  .header-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff;}
+  .header-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;}
+  .header-right{margin-left:auto;display:flex;gap:6px;align-items:center;}
+  .period-badge{display:inline-block;background:var(--brand);color:#fff;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase;}
+  .v2-badge{background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);font-size:10px;padding:3px 8px;border-radius:20px;}
+
+  .nav{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow-x:auto;}
+  .nav-tab{padding:12px 16px;font-size:12px;font-weight:500;color:var(--ink-3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+  .nav-tab:hover{color:var(--brand);}
+  .nav-tab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600;}
+
+  .main{padding:24px 28px;max-width:1200px;}
+  .section{display:none;}
+  .section.active{display:block;}
+
+  .kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px;}
+  .kpi{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;}
+  .kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--brand);}
+  .kpi.green::after{background:var(--green);}
+  .kpi.blue::after{background:var(--blue);}
+  .kpi.amber::after{background:var(--amber);}
+  .kpi.red::after{background:var(--red);}
+  .kpi.purple::after{background:var(--purple);}
+  .kpi.teal::after{background:var(--teal);}
+  .kpi-label{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
+  .kpi-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;}
+  .kpi-sub{font-size:10px;color:var(--ink-3);margin-top:4px;}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+  .grid-65-35{display:grid;grid-template-columns:65fr 35fr;gap:14px;margin-bottom:14px;}
+  .grid-60-40{display:grid;grid-template-columns:60fr 40fr;gap:14px;margin-bottom:14px;}
+  .grid-55-45{display:grid;grid-template-columns:55fr 45fr;gap:14px;margin-bottom:14px;}
+
+  .card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+  .card-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink-2);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .card-title .dot{width:8px;height:8px;border-radius:2px;background:var(--brand);flex-shrink:0;}
+  .card-title .dot.green{background:var(--green);}
+  .card-title .dot.blue{background:var(--blue);}
+  .card-title .dot.red{background:var(--red);}
+  .card-title .dot.amber{background:var(--amber);}
+  .card-title .dot.purple{background:var(--purple);}
+  .card-title .dot.teal{background:var(--teal);}
+
+  .chart-wrap{position:relative;}
+  .chart-h180{height:180px;}
+  .chart-h200{height:200px;}
+  .chart-h220{height:220px;}
+  .chart-h240{height:240px;}
+  .chart-h260{height:260px;}
+  .chart-h280{height:280px;}
+  .chart-h300{height:300px;}
+
+  .inner-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+  .inner-tab{font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--ink-3);cursor:pointer;transition:all .12s;}
+  .inner-tab:hover{border-color:var(--brand);color:var(--brand);}
+  .inner-tab.active{background:var(--brand);color:#fff;border-color:var(--brand);}
+
+  .legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;}
+  .leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-3);}
+  .leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+  .leg-circle{border-radius:50%;}
+  .leg-dash{height:2px;width:14px;flex-shrink:0;}
+
+  .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .bar-label{width:90px;font-size:11px;color:var(--ink-2);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bar-label-w120{width:120px;}
+  .bar-bg{flex:1;height:7px;background:var(--surface-2);border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px;transition:width .4s ease;}
+  .bar-val{font-size:11px;color:var(--ink-2);width:65px;text-align:right;flex-shrink:0;font-weight:500;}
+
+  .badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;}
+  .badge-green{background:var(--green-light);color:var(--green);}
+  .badge-red{background:var(--red-light);color:var(--red);}
+  .badge-amber{background:var(--amber-light);color:var(--amber);}
+  .badge-blue{background:var(--blue-light);color:var(--blue);}
+  .badge-brand{background:var(--brand-light);color:var(--brand-dark);}
+  .badge-neutral{background:var(--surface-2);color:var(--ink-3);}
+  .badge-purple{background:var(--purple-light);color:var(--purple);}
+  .badge-teal{background:var(--teal-light);color:var(--teal);}
+
+  .insight-box{background:var(--surface-2);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;padding:10px 14px;margin-top:12px;font-size:12px;color:var(--ink-2);line-height:1.6;}
+  .insight-box.green{border-left-color:var(--green);}
+  .insight-box.red{border-left-color:var(--red);}
+  .insight-box.amber{border-left-color:var(--amber);}
+  .insight-box.blue{border-left-color:var(--blue);}
+  .insight-box.purple{border-left-color:var(--purple);}
+  .insight-box strong{color:var(--ink);}
+
+  .mini-table{width:100%;border-collapse:collapse;font-size:11px;}
+  .mini-table th{text-align:left;padding:6px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-3);border-bottom:1px solid var(--border);}
+  .mini-table td{padding:7px 8px;border-bottom:1px solid var(--surface-2);color:var(--ink-2);}
+  .mini-table tr:last-child td{border-bottom:none;}
+  .mini-table tr:hover td{background:var(--surface-2);}
+  .td-right{text-align:right;font-weight:500;}
+  .td-good{color:var(--green);font-weight:600;}
+  .td-bad{color:var(--red);font-weight:600;}
+  .td-ok{color:var(--amber);font-weight:600;}
+  .td-na{color:var(--ink-3);}
+
+  .section-head{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--ink-2);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:8px;}
+  .section-head::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  .verdict-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface-2);border-radius:8px;margin-bottom:6px;font-size:12px;}
+  .verdict-row .v-type{font-weight:600;color:var(--ink);width:70px;flex-shrink:0;}
+  .verdict-row .v-spend{color:var(--ink-3);width:80px;flex-shrink:0;font-size:11px;}
+  .verdict-row .v-roas{font-family:'Syne',sans-serif;font-weight:700;width:50px;}
+
+  .action-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;}
+  .action-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;}
+  .action-num{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--surface-3);position:absolute;right:10px;top:4px;line-height:1;}
+  .action-tag{margin-bottom:8px;}
+  .action-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .action-body{font-size:11px;color:var(--ink-3);line-height:1.6;}
+
+  .bm-item{background:var(--surface-2);border-radius:8px;padding:10px 12px;border:1px solid var(--border);}
+  .bm-label{font-size:10px;color:var(--ink-3);margin-bottom:4px;}
+  .bm-val{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--ink);}
+  .bm-note{font-size:10px;color:var(--ink-3);margin-top:2px;}
+  .benchmark-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+
+  .notice-box{background:var(--blue-light);border:1px solid #A8C4E2;border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue);margin-bottom:12px;line-height:1.6;}
+  .notice-box strong{color:var(--blue);}
+
+  .divider{height:1px;background:var(--border);margin:16px 0;}
+
+  /* Seasonal */
+  .season-pill{display:inline-block;font-size:10px;font-weight:600;padding:3px 10px;border-radius:12px;margin-right:4px;}
+  .sp-high{background:#D4EDE3;color:#1A5C3A;}
+  .sp-low{background:#F5DADA;color:#6B1A1A;}
+  .sp-mid{background:#F5E6C8;color:#7A4A00;}
+
+  @media(max-width:900px){
+    .kpi-strip{grid-template-columns:repeat(3,1fr);}
+    .grid-2,.grid-3,.grid-65-35,.grid-60-40,.grid-55-45{grid-template-columns:1fr;}
+    .benchmark-grid{grid-template-columns:repeat(2,1fr);}
+    .action-cards{grid-template-columns:1fr;}
+    .main{padding:16px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">M</div>
+  <div>
+    <div class="header-title">Monde Eyewear — Facebook Ads Performance</div>
+    <div class="header-sub">Jan 2025 – Apr 2026 · 16 months · Ad-level analysis</div>
+  </div>
+  <div class="header-right">
+    <span class="v2-badge">v2</span>
+    <span class="period-badge">Jan 25 – Apr 26</span>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-tab active" onclick="showSection('overview')">📊 Overview</div>
+  <div class="nav-tab" onclick="showSection('structure')">🏗 Structure</div>
+  <div class="nav-tab" onclick="showSection('working')">✅ What's Working</div>
+  <div class="nav-tab" onclick="showSection('notworking')">⚠️ What's Not Working</div>
+  <div class="nav-tab" onclick="showSection('seasonal')">📅 Seasonal</div>
+  <div class="nav-tab" onclick="showSection('benchmark')">🎯 Benchmarks</div>
+  <div class="nav-tab" onclick="showSection('action')">🚀 Next Actions</div>
+</div>
+
+<div class="main">
+
+<!-- ===== OVERVIEW ===== -->
+<div class="section active" id="sec-overview">
+
+  <div class="kpi-strip">
+    <div class="kpi">
+      <div class="kpi-label">Total Spend</div>
+      <div class="kpi-val">฿8.35M</div>
+      <div class="kpi-sub">16 months Jan25–Apr26</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-label">Avg Monthly Spend</div>
+      <div class="kpi-val">฿522K</div>
+      <div class="kpi-sub">Range ฿263K–฿744K</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-label">Total Purchases</div>
+      <div class="kpi-val">6,399</div>
+      <div class="kpi-sub">Offline attributed</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-label">Overall ROAS</div>
+      <div class="kpi-val">4.24x</div>
+      <div class="kpi-sub">Revenue ฿35.4M</div>
+    </div>
+    <div class="kpi teal">
+      <div class="kpi-label">Total Reach</div>
+      <div class="kpi-val">145M</div>
+      <div class="kpi-sub">Unique accounts reached</div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-label">Trend ROAS Apr26</div>
+      <div class="kpi-val">↘ 2.08x</div>
+      <div class="kpi-sub">ต่ำสุด 16 เดือน</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title"><span class="dot"></span>Monthly Spend · Purchases · ROAS · Reach</div>
+    <div class="inner-tabs">
+      <button class="inner-tab active" onclick="switchMain('spend',this)">Spend & Purchases</button>
+      <button class="inner-tab" onclick="switchMain('roas',this)">ROAS Trend</button>
+      <button class="inner-tab" onclick="switchMain('reach',this)">Reach Trend</button>
+      <button class="inner-tab" onclick="switchMain('cpm',this)">CPM Trend</button>
+      <button class="inner-tab" onclick="switchMain('stack',this)">Budget by Type</button>
+    </div>
+    <div class="legend" id="main-leg">
+      <span class="leg-item"><span class="leg-dot" style="background:#B5D4F4"></span>Spend (฿)</span>
+      <span class="leg-item"><span class="leg-dot leg-circle" style="background:var(--green)"></span>Purchases (qty)</span>
+    </div>
+    <div class="chart-wrap chart-h260"><canvas id="mainChart"></canvas></div>
+    <div class="insight-box" id="main-ins">
+      <strong>Peak Performance:</strong> Jan–Feb 2025 ROAS สูงสุด (9.46x) ช่วง Launch phase + Low competition.
+      H2/2025 KOL Budget ขยาย 10x แต่ ROAS ดิ่ง. Apr 2026 ROAS เหลือ 2.08x — ต่ำสุด 16 เดือน.
+    </div>
+  </div>
+
+  <div class="grid-65-35">
+    <div class="card">
+      <div class="card-title"><span class="dot blue"></span>Budget Allocation by Objective</div>
+      <div class="chart-wrap chart-h200"><canvas id="objChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot green"></span>ROAS & Reach by Objective</div>
+      <table class="mini-table">
+        <thead><tr><th>Objective</th><th>Spend%</th><th class="td-right">ROAS</th><th class="td-right">Verdict</th></tr></thead>
+        <tbody>
+          <tr><td>Engagement</td><td>88%</td><td class="td-right td-good">4.65x</td><td class="td-right"><span class="badge badge-green">Core</span></td></tr>
+          <tr><td>Traffic</td><td>2%</td><td class="td-right td-ok">4.40x</td><td class="td-right"><span class="badge badge-blue">OK</span></td></tr>
+          <tr><td>Awareness</td><td>10%</td><td class="td-right td-bad">0.57x</td><td class="td-right"><span class="badge badge-red">Drain</span></td></tr>
+          <tr><td>Sales</td><td>&lt;1%</td><td class="td-right td-bad">0.30x</td><td class="td-right"><span class="badge badge-red">Weak</span></td></tr>
+        </tbody>
+      </table>
+      <div class="insight-box red" style="margin-top:10px;">
+        <strong>Awareness 10% Budget → ROAS 0.57x</strong> — ขาดทุนสุทธิ ส่วนมากมาจาก BRD campaign ที่ใช้ Awareness obj โดยตรง ซึ่งเป็น expected behavior สำหรับ Brand campaign
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STRUCTURE ===== -->
+<div class="section" id="sec-structure">
+
+  <div class="kpi-strip">
+    <div class="kpi green">
+      <div class="kpi-label">AWO ROAS</div>
+      <div class="kpi-val">15.2x</div>
+      <div class="kpi-sub">Best performer · 12% budget</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-label">KOL Budget Share</div>
+      <div class="kpi-val">32%</div>
+      <div class="kpi-sub">KOL_SO + KOL_FS + KOL</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-label">SO Budget Share</div>
+      <div class="kpi-val">31%</div>
+      <div class="kpi-sub">New Store Opening</div>
+    </div>
+    <div class="kpi purple">
+      <div class="kpi-label">BRD Budget Share</div>
+      <div class="kpi-val">9%</div>
+      <div class="kpi-sub">Brand Awareness — ไม่วัด Purchase</div>
+    </div>
+    <div class="kpi teal">
+      <div class="kpi-label">OCC ROAS</div>
+      <div class="kpi-val">8.4x</div>
+      <div class="kpi-sub">Promo burst — underrated</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Album vs VDO</div>
+      <div class="kpi-val">6.2x vs 1.95x</div>
+      <div class="kpi-sub">ROAS — Album wins 3x</div>
+    </div>
+  </div>
+
+  <div class="section-head">Campaign Type — Full Breakdown</div>
+
+  <!-- Notice for BRD -->
+  <div class="notice-box">
+    <strong>📌 หมายเหตุ BRD (Brand Campaign):</strong> วัตถุประสงค์หลักคือ Awareness ไม่ใช่ Purchase — Purchase ที่ track ได้ต่ำเป็นเรื่องปกติ
+    การประเมิน BRD ควรใช้ Reach, CPM และ Brand recall เป็น KPI หลัก ไม่ใช่ ROAS
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title"><span class="dot"></span>Spend vs Purchases by Campaign Type (Monthly Stacked)</div>
+    <div class="chart-wrap chart-h260"><canvas id="ctStackChart"></canvas></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title"><span class="dot"></span>Campaign Type Summary</div>
+    <div style="overflow-x:auto;">
+      <table class="mini-table">
+        <thead>
+          <tr>
+            <th>Type</th><th>Sub</th>
+            <th class="td-right">Total Spend</th><th class="td-right">Spend%</th>
+            <th class="td-right">Purchases</th><th class="td-right">ROAS</th>
+            <th class="td-right">CPP avg</th><th class="td-right">KPI</th><th class="td-right">Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>AWO</strong></td><td class="td-na">Always-On Retargeting</td>
+            <td class="td-right">฿977K</td><td class="td-right">12%</td>
+            <td class="td-right">2,646</td><td class="td-right td-good">15.2x</td>
+            <td class="td-right td-good">฿369</td><td class="td-right">Purchase</td>
+            <td class="td-right"><span class="badge badge-green">★ Star</span></td>
+          </tr>
+          <tr>
+            <td><strong>KOL_SO</strong></td><td class="td-na">KOL × New Store</td>
+            <td class="td-right">฿2.50M</td><td class="td-right">30%</td>
+            <td class="td-right">906</td><td class="td-right td-bad">2.28x</td>
+            <td class="td-right td-bad">฿2,763</td><td class="td-right">Purchase</td>
+            <td class="td-right"><span class="badge badge-red">Review</span></td>
+          </tr>
+          <tr>
+            <td><strong>SO</strong></td><td class="td-na">New Store (Non-KOL)</td>
+            <td class="td-right">฿2.60M</td><td class="td-right">31%</td>
+            <td class="td-right">1,204</td><td class="td-right td-ok">2.47x</td>
+            <td class="td-right td-ok">฿2,157</td><td class="td-right">Purchase/Reach*</td>
+            <td class="td-right"><span class="badge badge-amber">Watch</span></td>
+          </tr>
+          <tr>
+            <td><strong>FS</strong></td><td class="td-na">Focus Store</td>
+            <td class="td-right">฿784K</td><td class="td-right">9%</td>
+            <td class="td-right">585</td><td class="td-right td-good">3.84x</td>
+            <td class="td-right td-good">฿1,340</td><td class="td-right">Purchase</td>
+            <td class="td-right"><span class="badge badge-brand">Good</span></td>
+          </tr>
+          <tr>
+            <td><strong>KOL_FS</strong></td><td class="td-na">KOL × Focus Store</td>
+            <td class="td-right">฿155K</td><td class="td-right">2%</td>
+            <td class="td-right">19</td><td class="td-right td-bad">0.65x</td>
+            <td class="td-right td-bad">฿8,179</td><td class="td-right">Purchase</td>
+            <td class="td-right"><span class="badge badge-red">Weak</span></td>
+          </tr>
+          <tr>
+            <td><strong>BRD</strong></td><td class="td-na">Brand Awareness</td>
+            <td class="td-right">฿736K</td><td class="td-right">9%</td>
+            <td class="td-right">148*</td><td class="td-right td-na">—</td>
+            <td class="td-right td-na">—</td><td class="td-right">Reach / CPM</td>
+            <td class="td-right"><span class="badge badge-purple">Brand KPI</span></td>
+          </tr>
+          <tr>
+            <td><strong>OCC</strong></td><td class="td-na">Promo / Occasion</td>
+            <td class="td-right">฿454K</td><td class="td-right">5%</td>
+            <td class="td-right">697</td><td class="td-right td-good">8.4x</td>
+            <td class="td-right td-good">฿651</td><td class="td-right">Purchase</td>
+            <td class="td-right"><span class="badge badge-teal">Underrated</span></td>
+          </tr>
+          <tr>
+            <td><strong>WEB</strong></td><td class="td-na">Website Traffic</td>
+            <td class="td-right">฿100K</td><td class="td-right">1%</td>
+            <td class="td-right">57</td><td class="td-right td-ok">2.35x</td>
+            <td class="td-right td-ok">฿1,747</td><td class="td-right">Purchase</td>
+            <td class="td-right"><span class="badge badge-neutral">Test</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:10px;color:var(--ink-3);margin-top:8px;">* SO Mar 2026 เป็นต้นไป เปลี่ยน objective เป็น Reach — ดู Reach tab ใน Overview · * BRD Purchase เป็น incidental attribution ไม่ใช่ primary KPI</div>
+  </div>
+
+  <!-- SO Reach Objective Change -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title"><span class="dot teal"></span>SO Campaign: Messaging → Reach Objective (Mar 2026+)</div>
+    <div class="notice-box" style="margin-bottom:12px;">
+      <strong>Context:</strong> SO (Non-KOL) เปลี่ยน Objective จาก Messaging → Reach ตั้งแต่ Mar 2026
+      Metric หลักจึงเปลี่ยน: Purchase/CPP ไม่ใช่ตัวชี้วัดหลักอีกต่อไป ควรดู Reach + CPM แทน
+    </div>
+    <div class="chart-wrap chart-h220"><canvas id="soReachChart"></canvas></div>
+    <div class="insight-box blue">
+      Apr 2026 SO Reach พุ่ง <strong>4.84M</strong> (สูงสุดใน SO ทั้งหมด) พร้อม CPM ต่ำ — สอดคล้องกับ Reach objective ที่ optimize เพื่อ scale audience ไม่ใช่ convert. Purchase ที่ดูเหมือนลดลงไม่ใช่ performance drop แต่เป็น objective shift
+    </div>
+  </div>
+
+  <!-- Ad Format -->
+  <div class="section-head">Ad Format Comparison</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot green"></span>Album — ชนะในทุก Metric</div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <div><div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--green);">6.18x</div><div style="font-size:11px;color:var(--ink-3);">ROAS · 4,549 Purchases</div></div>
+        <div style="text-align:right;"><div style="font-size:13px;font-weight:600;">฿4.14M</div><div style="font-size:11px;color:var(--ink-3);">50% Spend → 71% Purchase</div></div>
+      </div>
+      <div class="bar-row"><div class="bar-label">Spend Share</div><div class="bar-bg"><div class="bar-fill" style="width:50%;background:var(--green)"></div></div><div class="bar-val">50%</div></div>
+      <div class="bar-row"><div class="bar-label">Purchase Share</div><div class="bar-bg"><div class="bar-fill" style="width:71%;background:var(--green)"></div></div><div class="bar-val">71%</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot red"></span>VDO — Spend สูง Return ต่ำ</div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <div><div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--red);">1.95x</div><div style="font-size:11px;color:var(--ink-3);">ROAS · 1,247 Purchases</div></div>
+        <div style="text-align:right;"><div style="font-size:13px;font-weight:600;">฿3.42M</div><div style="font-size:11px;color:var(--ink-3);">41% Spend → 19% Purchase</div></div>
+      </div>
+      <div class="bar-row"><div class="bar-label">Spend Share</div><div class="bar-bg"><div class="bar-fill" style="width:41%;background:var(--red)"></div></div><div class="bar-val">41%</div></div>
+      <div class="bar-row"><div class="bar-label">Purchase Share</div><div class="bar-bg"><div class="bar-fill" style="width:19%;background:var(--red)"></div></div><div class="bar-val">19%</div></div>
+      <div class="insight-box red">VDO อาจ work ในฐานะ Brand/Awareness tool แต่ไม่ใช่ Purchase driver — โดยเฉพาะเมื่อใช้กับ Cold Audience</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== WHAT'S WORKING ===== -->
+<div class="section" id="sec-working">
+
+  <div class="section-head">Best Performers</div>
+
+  <!-- AWO + OCC side by side -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot green"></span>AWO — Engine หลัก (ROAS 15.2x)</div>
+      <div class="chart-wrap chart-h200"><canvas id="awoChart"></canvas></div>
+      <div class="insight-box green">
+        AWO ทำ Positive ROAS ทุกเดือนโดยไม่มีข้อยกเว้น. Budget เพิ่มขึ้น แต่ ROAS ยังคงอยู่ที่ 9–43x
+        Pattern: <strong>SA: Monde Engagers + Album + USP/KOLMashup</strong> = สูตรที่พิสูจน์แล้ว
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot teal"></span>OCC — Underrated Star (ROAS avg 8.4x)</div>
+      <div class="chart-wrap chart-h200"><canvas id="occChart"></canvas></div>
+      <div class="insight-box" style="border-left-color:var(--teal);">
+        OCC เป็น Promo/Occasion campaign — เมื่อ fire จะให้ ROAS สูงมาก (Feb25: 10.7x, Dec25: 11.2x, Jan26: 19.2x)
+        Budget เพียง 5% แต่ทำ Purchase 10% ของ Total — <strong>ควร scale ขึ้น</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Ad Sets -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title"><span class="dot green"></span>Top Ad Sets by ROAS (Warm Audience Pattern)</div>
+    <table class="mini-table">
+      <thead><tr><th>Ad Set Pattern</th><th>Type</th><th class="td-right">Purchases</th><th class="td-right">CPP</th><th class="td-right">ROAS</th></tr></thead>
+      <tbody>
+        <tr><td>Monde USP | SA: All Monde engagers (Excl 180d)</td><td><span class="badge badge-green">AWO</span></td><td class="td-right">79</td><td class="td-right td-good">฿86</td><td class="td-right td-good">61.6x</td></tr>
+        <tr><td>AfterSale+BVAX | SA: All Monde engagers</td><td><span class="badge badge-green">AWO</span></td><td class="td-right">86</td><td class="td-right td-good">฿204</td><td class="td-right td-good">36.3x</td></tr>
+        <tr><td>KOLMashup | SA: All Monde engagers (Excl 180d)</td><td><span class="badge badge-green">AWO</span></td><td class="td-right">399</td><td class="td-right td-good">฿162</td><td class="td-right td-good">34.1x</td></tr>
+        <tr><td>Product | SA: All Monde engagers (Excl 180d)</td><td><span class="badge badge-green">AWO</span></td><td class="td-right">177</td><td class="td-right td-good">฿182</td><td class="td-right td-good">30.2x</td></tr>
+        <tr><td>USP/Warranty | SA: All Monde engagers (Excl 180d)</td><td><span class="badge badge-green">AWO</span></td><td class="td-right">253</td><td class="td-right td-good">฿181</td><td class="td-right td-good">31.1x</td></tr>
+        <tr><td>KOLMashUp/CustomerReview | All Provinces Adv+</td><td><span class="badge badge-green">AWO</span></td><td class="td-right">360</td><td class="td-right td-good">฿233</td><td class="td-right td-good">22.6x</td></tr>
+        <tr><td>Monde USP | All Provinces Adv+ | All Stores</td><td><span class="badge badge-brand">Mixed</span></td><td class="td-right">438</td><td class="td-right td-ok">฿750</td><td class="td-right td-good">7.72x</td></tr>
+      </tbody>
+    </table>
+    <div class="insight-box green">
+      <strong>Pattern ชัด 100%:</strong> SA (Saved Audience) targeting Monde Engagers + Album format = ROAS 20x+ เสมอ
+      ทุก top performer ใช้ Warm Audience — ไม่มี Cold/Broad Audience อยู่ใน list นี้เลย
+    </div>
+  </div>
+
+  <!-- Peak months -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot blue"></span>Peak Months</div>
+      <table class="mini-table">
+        <thead><tr><th>Month</th><th class="td-right">Purchases</th><th class="td-right">ROAS</th><th class="td-right">Note</th></tr></thead>
+        <tbody>
+          <tr><td>Jan 2026</td><td class="td-right">642</td><td class="td-right td-good">6.45x</td><td class="td-right"><span class="badge badge-green">Best QTY</span></td></tr>
+          <tr><td>Feb 2025</td><td class="td-right">559</td><td class="td-right td-good">9.46x</td><td class="td-right"><span class="badge badge-green">Best ROAS</span></td></tr>
+          <tr><td>Dec 2025</td><td class="td-right">622</td><td class="td-right td-good">4.91x</td><td class="td-right"><span class="badge badge-brand">High Season</span></td></tr>
+          <tr><td>Jul 2025</td><td class="td-right">460</td><td class="td-right td-good">5.60x</td><td class="td-right"><span class="badge badge-blue">Mid-year peak</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot amber"></span>Best Creative Themes</div>
+      <div style="font-size:11px;color:var(--ink-3);line-height:2.2;">
+        🥇 <strong>USP / Warranty / BVAX</strong> — Proof-based, trust-building<br>
+        🥈 <strong>KOLMashup / CustomerReview</strong> — Social proof retargeting<br>
+        🥉 <strong>Product Album (Brand + Feature)</strong> — Visual catalog<br>
+        4️⃣ <strong>AfterSale / AfterService</strong> — Loyalty loop<br>
+        5️⃣ <strong>OCC Promo</strong> — Urgency/Partnership burst
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== WHAT'S NOT WORKING ===== -->
+<div class="section" id="sec-notworking">
+
+  <div class="section-head">Structural Problems</div>
+
+  <!-- KOL Decline -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title"><span class="dot red"></span>KOL_SO — Budget ขยาย 10x แต่ ROAS ดิ่งจาก 5.7x → 0.45x</div>
+    <div class="chart-wrap chart-h240"><canvas id="kolChart"></canvas></div>
+    <div class="grid-2" style="margin-top:12px;">
+      <div class="insight-box red" style="margin-top:0;">
+        <strong>Root Cause:</strong> KOL_SO Budget ขยาย ฿25K → ฿290K/เดือน แต่ Creative Refresh ไม่ตาม
+        Audience Saturation ชัดเจน — คนเดิมเห็น KOL เดิมซ้ำ
+      </div>
+      <div class="insight-box amber" style="margin-top:0;">
+        <strong>KOL_FS ยิ่งแย่กว่า:</strong> เพิ่งเริ่ม Jan 2026 แต่ ROAS ต่ำสุด 0.02–0.64x
+        ฿155K Spend รวม — ควร pause และทบทวน KOL selection
+      </div>
+    </div>
+  </div>
+
+  <!-- KOL Subtype table -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title"><span class="dot red"></span>KOL Subtype Detail — H2/2025 vs Q1-Q2/2026</div>
+    <table class="mini-table">
+      <thead><tr><th>Period</th><th>KOL_SO Spend</th><th class="td-right">KOL_SO ROAS</th><th>KOL_FS Spend</th><th class="td-right">KOL_FS ROAS</th><th class="td-right">Signal</th></tr></thead>
+      <tbody>
+        <tr><td>H1/2025 avg</td><td>฿41K/mo</td><td class="td-right td-good">3.5–5.7x</td><td class="td-na">—</td><td class="td-na td-right">—</td><td class="td-right"><span class="badge badge-green">Healthy</span></td></tr>
+        <tr><td>H2/2025 avg</td><td>฿242K/mo</td><td class="td-right td-ok">2.4x</td><td class="td-na">—</td><td class="td-na td-right">—</td><td class="td-right"><span class="badge badge-amber">Declining</span></td></tr>
+        <tr><td>Jan 2026</td><td>฿227K</td><td class="td-right td-ok">3.51x</td><td>฿17K</td><td class="td-right td-ok">3.54x</td><td class="td-right"><span class="badge badge-amber">Bounce</span></td></tr>
+        <tr><td>Feb 2026</td><td>฿159K</td><td class="td-right td-bad">2.23x</td><td>฿42K</td><td class="td-right td-bad">0.39x</td><td class="td-right"><span class="badge badge-red">Warning</span></td></tr>
+        <tr><td>Mar 2026</td><td>฿205K</td><td class="td-right td-bad">0.66x</td><td>฿59K</td><td class="td-right td-bad">0.02x</td><td class="td-right"><span class="badge badge-red">Critical</span></td></tr>
+        <tr><td>Apr 2026</td><td>฿290K</td><td class="td-right td-bad">0.45x</td><td>฿37K</td><td class="td-right td-bad">0.64x</td><td class="td-right"><span class="badge badge-red">Pause now</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SO 2026 + Awareness -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot amber"></span>SO (Non-KOL) — ROAS ลดลง + Objective เปลี่ยน</div>
+      <table class="mini-table">
+        <thead><tr><th>Month</th><th class="td-right">Spend</th><th class="td-right">Purchase</th><th class="td-right">ROAS</th><th class="td-right">Note</th></tr></thead>
+        <tbody>
+          <tr><td>Jan 2026</td><td class="td-right">฿185K</td><td class="td-right">131</td><td class="td-right td-good">4.09x</td><td class="td-right">Messaging</td></tr>
+          <tr><td>Feb 2026</td><td class="td-right">฿218K</td><td class="td-right">76</td><td class="td-right td-bad">1.79x</td><td class="td-right">Messaging</td></tr>
+          <tr><td>Mar 2026</td><td class="td-right">฿237K</td><td class="td-right">82</td><td class="td-right td-bad">1.75x</td><td class="td-right"><span class="badge badge-teal">→ Reach</span></td></tr>
+          <tr><td>Apr 2026</td><td class="td-right">฿154K</td><td class="td-right">37</td><td class="td-right td-na">0.98x*</td><td class="td-right"><span class="badge badge-teal">Reach obj</span></td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:10px;color:var(--ink-3);margin-top:6px;">* Apr 26 ใช้ Reach objective — ROAS ต่ำเป็น expected, ดูที่ Reach แทน</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot red"></span>Awareness Objective — ขาดทุนสุทธิ</div>
+      <div style="text-align:center;padding:12px 0;">
+        <div style="font-family:'Syne',sans-serif;font-size:44px;font-weight:800;color:var(--red);">0.57x</div>
+        <div style="font-size:12px;color:var(--ink-3);">ROAS (ต่ำกว่า break-even 1.0x)</div>
+        <div style="font-size:13px;font-weight:600;margin:8px 0;">฿814,983 Spend → ฿460K Revenue</div>
+      </div>
+      <div class="insight-box red">
+        ส่วนใหญ่มาจาก BRD Awareness เป็น expected behavior แต่ควร <strong>separate BRD budget ออกจาก Performance budget</strong>
+        เพื่อไม่ให้ Awareness drag ROAS overall
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SEASONAL ===== -->
+<div class="section" id="sec-seasonal">
+
+  <div class="section-head">Seasonal Analysis</div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title"><span class="dot blue"></span>Seasonal Trend — 3 มุมมอง</div>
+    <div class="inner-tabs">
+      <button class="inner-tab active" onclick="switchSeason('mom',this)">MoM % Change</button>
+      <button class="inner-tab" onclick="switchSeason('half',this)">H1 vs H2 Pattern</button>
+      <button class="inner-tab" onclick="switchSeason('yoy',this)">YoY: Jan–Apr 2025 vs 2026</button>
+    </div>
+    <div class="chart-wrap chart-h260"><canvas id="seasonChart"></canvas></div>
+    <div class="insight-box" id="season-ins">
+      <strong>MoM Pattern:</strong> Feb 25 พุ่ง +221% (OCC Promo burst). ช่วง Jun–Jul มักมี Purchase drop ก่อน rebound. Dec เป็น peak เพราะ seasonality + OCC holiday campaign.
+    </div>
+  </div>
+
+  <!-- Seasonal Summary Cards -->
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title"><span class="dot green"></span>High Season Months</div>
+      <div style="font-size:11px;line-height:2.2;">
+        <span class="season-pill sp-high">Jan</span> New Year demand surge<br>
+        <span class="season-pill sp-high">Feb</span> OCC Promo + CNY period<br>
+        <span class="season-pill sp-high">Jul</span> Mid-year — school restart<br>
+        <span class="season-pill sp-high">Dec</span> Year-end + Holiday spend<br>
+      </div>
+      <div class="insight-box green" style="margin-top:8px;">
+        <strong>Q1 + Q4</strong> เป็นช่วงที่ Purchase สูง — ควร pile budget เพิ่มในช่วงนี้ โดยเฉพาะ AWO + OCC
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot red"></span>Low Season Months</div>
+      <div style="font-size:11px;line-height:2.2;">
+        <span class="season-pill sp-low">May</span> Post-Songkran slowdown<br>
+        <span class="season-pill sp-low">Jun</span> ต่อเนื่องจาก May<br>
+        <span class="season-pill sp-low">Sep</span> Post Back-to-school plateau<br>
+        <span class="season-pill sp-low">Apr (26)</span> ลดลงผิดปกติ — ปัญหา KOL<br>
+      </div>
+      <div class="insight-box red" style="margin-top:8px;">
+        <strong>ช่วง May–Jun</strong> เป็น natural low season ควร reduce KOL spend + maintain AWO เท่านั้น
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot amber"></span>YoY Comparison Jan–Apr</div>
+      <div style="padding:8px 0;">
+        <div class="bar-row">
+          <div class="bar-label bar-label-w120">Spend 2025</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:47%;background:#B5D4F4"></div></div>
+          <div class="bar-val">฿1.27M</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label bar-label-w120">Spend 2026</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:100%;background:var(--amber)"></div></div>
+          <div class="bar-val">฿2.72M</div>
+        </div>
+        <div class="bar-row" style="margin-top:8px;">
+          <div class="bar-label bar-label-w120">Purchases 2025</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:78%;background:#B5D4F4"></div></div>
+          <div class="bar-val">1,329</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label bar-label-w120">Purchases 2026</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:100%;background:var(--green)"></div></div>
+          <div class="bar-val">1,710</div>
+        </div>
+        <div class="bar-row" style="margin-top:8px;">
+          <div class="bar-label bar-label-w120">Avg ROAS 2025</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:100%;background:var(--green)"></div></div>
+          <div class="bar-val">5.84x</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label bar-label-w120">Avg ROAS 2026</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:62%;background:var(--red)"></div></div>
+          <div class="bar-val">3.65x</div>
+        </div>
+      </div>
+      <div class="insight-box amber" style="margin-top:0;">
+        Spend +115% แต่ ROAS -37% — Budget ขยายเร็วกว่า Quality ของ Campaign
+      </div>
+    </div>
+  </div>
+
+  <!-- H1 vs H2 summary -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title"><span class="dot"></span>H1 vs H2 Pattern (2025)</div>
+    <div class="grid-2">
+      <div>
+        <table class="mini-table">
+          <thead><tr><th>Metric</th><th class="td-right">H1/2025</th><th class="td-right">H2/2025</th><th class="td-right">Change</th></tr></thead>
+          <tbody>
+            <tr><td>Total Spend</td><td class="td-right">฿2.05M</td><td class="td-right">฿3.58M</td><td class="td-right td-bad">+75%</td></tr>
+            <tr><td>Purchases</td><td class="td-right">1,875</td><td class="td-right">2,815</td><td class="td-right td-ok">+50%</td></tr>
+            <tr><td>Avg ROAS</td><td class="td-right td-good">5.17x</td><td class="td-right td-bad">4.03x</td><td class="td-right td-bad">-22%</td></tr>
+            <tr><td>Avg CPP</td><td class="td-right td-good">฿1,094</td><td class="td-right td-bad">฿1,271</td><td class="td-right td-bad">+16%</td></tr>
+            <tr><td>KOL Spend share</td><td class="td-right">13%</td><td class="td-right td-bad">50%</td><td class="td-right td-bad">+37pp</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="insight-box amber" style="height:100%;margin-top:0;">
+          <strong>H2/2025 ปัญหาหลัก:</strong> KOL Budget share กระโดดจาก 13% → 50% ทำให้ Budget ไปกองอยู่กับ Campaign Type ที่ ROAS ต่ำ ส่งผลให้ Avg ROAS ตก -22% ทั้งที่ Spend เพิ่ม +75%
+          <br><br>
+          <strong>Takeaway:</strong> Budget scale ต้องมาพร้อมกับ Creative refresh rate ที่สูงขึ้นด้วย — โดยเฉพาะ KOL
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== BENCHMARKS ===== -->
+<div class="section" id="sec-benchmark">
+
+  <div class="section-head">In-House Benchmarks จาก Data จริง 16 เดือน</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot green"></span>Performance KPI Targets</div>
+      <div class="benchmark-grid">
+        <div class="bm-item"><div class="bm-label">Monthly Purchases</div><div class="bm-val" style="color:var(--green);">≥ 450</div><div class="bm-note">P75 = 469, Median = 420</div></div>
+        <div class="bm-item"><div class="bm-label">Overall ROAS</div><div class="bm-val" style="color:var(--green);">≥ 3.5x</div><div class="bm-note">P25 of historical = 3.3x</div></div>
+        <div class="bm-item"><div class="bm-label">AWO ROAS</div><div class="bm-val" style="color:var(--green);">≥ 12x</div><div class="bm-note">Historical avg = 15.2x</div></div>
+        <div class="bm-item"><div class="bm-label">OCC ROAS</div><div class="bm-val" style="color:var(--teal);">≥ 6x</div><div class="bm-note">Historical avg = 8.4x</div></div>
+        <div class="bm-item"><div class="bm-label">KOL_SO ROAS</div><div class="bm-val" style="color:var(--amber);">≥ 3.0x</div><div class="bm-note">H1/25 baseline = 3.5–5.7x</div></div>
+        <div class="bm-item"><div class="bm-label">SO ROAS (Msg obj)</div><div class="bm-val" style="color:var(--amber);">≥ 2.5x</div><div class="bm-note">H1/25 avg = 2.3x</div></div>
+        <div class="bm-item"><div class="bm-label">Cost Per Purchase</div><div class="bm-val" style="color:var(--blue);">≤ ฿1,200</div><div class="bm-note">AWO = ฿369, all = ฿1,305</div></div>
+        <div class="bm-item"><div class="bm-label">Album Format %</div><div class="bm-val" style="color:var(--green);">≥ 65%</div><div class="bm-note">ปัจจุบัน 50%</div></div>
+        <div class="bm-item"><div class="bm-label">VDO Format %</div><div class="bm-val" style="color:var(--red);">≤ 20%</div><div class="bm-note">ปัจจุบัน 41%</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot purple"></span>BRD Brand KPIs (แยกจาก Performance)</div>
+      <div class="benchmark-grid" style="grid-template-columns:1fr 1fr;margin-top:0;">
+        <div class="bm-item"><div class="bm-label">Monthly Reach (BRD)</div><div class="bm-val" style="color:var(--purple);">≥ 1.5M</div><div class="bm-note">Avg active months = 1.9M</div></div>
+        <div class="bm-item"><div class="bm-label">BRD CPM</div><div class="bm-val" style="color:var(--purple);">≤ ฿35</div><div class="bm-note">Range: ฿9–฿49</div></div>
+        <div class="bm-item"><div class="bm-label">BRD Budget % (max)</div><div class="bm-val" style="color:var(--amber);">10%</div><div class="bm-note">ปัจจุบัน 9% — OK</div></div>
+        <div class="bm-item"><div class="bm-label">BRD KPI Primary</div><div class="bm-val" style="color:var(--purple);">Reach</div><div class="bm-note">ไม่ใช่ ROAS/Purchase</div></div>
+      </div>
+      <div class="notice-box" style="margin-top:10px;">
+        <strong>สำคัญ:</strong> BRD ควร report แยก deck จาก Performance campaigns เพื่อไม่ให้ drag overall ROAS และทำให้การประเมินผิดเพี้ยน
+      </div>
+
+      <div class="card-title" style="margin-top:16px;"><span class="dot teal"></span>SO Reach KPIs (Mar 2026+ — Reach Objective)</div>
+      <div class="benchmark-grid" style="grid-template-columns:1fr 1fr;margin-top:0;">
+        <div class="bm-item"><div class="bm-label">SO Monthly Reach</div><div class="bm-val" style="color:var(--teal);">≥ 2M</div><div class="bm-note">Apr26 = 4.8M (best)</div></div>
+        <div class="bm-item"><div class="bm-label">SO CPM (Reach obj)</div><div class="bm-val" style="color:var(--teal);">—</div><div class="bm-note">ต้องรวบรวม data เพิ่ม</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget Reallocation -->
+  <div class="card" style="margin-top:14px;">
+    <div class="card-title"><span class="dot"></span>Proposed Budget Reallocation</div>
+    <div style="overflow-x:auto;">
+      <table class="mini-table">
+        <thead><tr><th>Type</th><th class="td-right">ปัจจุบัน %</th><th class="td-right">แนะนำ %</th><th class="td-right">ROAS ปัจจุบัน</th><th class="td-right">Expected</th><th>Rationale</th></tr></thead>
+        <tbody>
+          <tr><td><strong>AWO</strong></td><td class="td-right">12%</td><td class="td-right td-good"><strong>22%</strong></td><td class="td-right td-good">15.2x</td><td class="td-right td-good">12–15x</td><td style="font-size:11px;color:var(--green);">Best ROI — severely underfunded</td></tr>
+          <tr><td><strong>OCC</strong></td><td class="td-right">5%</td><td class="td-right td-good"><strong>10%</strong></td><td class="td-right td-good">8.4x</td><td class="td-right td-good">6–8x</td><td style="font-size:11px;color:var(--green);">Underrated — scale promo bursts</td></tr>
+          <tr><td><strong>SO (Non-KOL)</strong></td><td class="td-right">31%</td><td class="td-right">28%</td><td class="td-right td-ok">2.47x</td><td class="td-right td-ok">2.5–3x</td><td style="font-size:11px;color:var(--ink-3);">Maintain — เฉพาะ strong branches</td></tr>
+          <tr><td><strong>FS</strong></td><td class="td-right">9%</td><td class="td-right">10%</td><td class="td-right td-good">3.84x</td><td class="td-right td-good">3.5–4x</td><td style="font-size:11px;color:var(--green);">Consistent — maintain + slight increase</td></tr>
+          <tr><td><strong>KOL (all)</strong></td><td class="td-right">32%</td><td class="td-right td-bad"><strong>18%</strong></td><td class="td-right td-bad">2.02x</td><td class="td-right td-ok">3.0x+</td><td style="font-size:11px;color:var(--red);">ลด budget + rotate creative + pause KOL_FS</td></tr>
+          <tr><td><strong>BRD</strong></td><td class="td-right">9%</td><td class="td-right">9%</td><td class="td-right td-na">—</td><td class="td-right td-na">—</td><td style="font-size:11px;color:var(--purple);">คงไว้ — แต่ report แยก deck</td></tr>
+          <tr><td><strong>WEB/Other</strong></td><td class="td-right">3%</td><td class="td-right">3%</td><td class="td-right td-ok">2.35x</td><td class="td-right td-ok">3x+</td><td style="font-size:11px;color:var(--ink-3);">Test mode — watch & scale if proven</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NEXT ACTIONS ===== -->
+<div class="section" id="sec-action">
+  <div class="section-head">Priority Actions</div>
+
+  <div class="action-cards">
+    <div class="action-card">
+      <div class="action-num">01</div>
+      <div class="action-tag"><span class="badge badge-red">ด่วน — ภายใน 1 สัปดาห์</span></div>
+      <div class="action-title">Pause KOL_FS + ลด KOL_SO Budget</div>
+      <div class="action-body">
+        KOL_FS ROAS ต่ำสุด 0.02–0.64x — pause ทันที ประหยัด ~฿37–60K/เดือน<br><br>
+        ลด KOL_SO จาก ~฿290K → ฿150K/เดือน เหลือเฉพาะ KOL ที่เคยทำ ROAS ≥ 3.0x ใน H1/2025<br><br>
+        Budget ที่ประหยัดได้ → ย้ายไป AWO ทันที
+      </div>
+    </div>
+    <div class="action-card">
+      <div class="action-num">02</div>
+      <div class="action-tag"><span class="badge badge-amber">ภายใน 2 สัปดาห์</span></div>
+      <div class="action-title">Scale AWO + OCC ด้วย Budget ที่ประหยัดจาก KOL</div>
+      <div class="action-body">
+        AWO เพิ่มจาก 12% → 22% ของ Total Budget<br>
+        สร้าง Ad Set ใหม่: AfterSale + BVAX | CA: All Customers + SA: 30d Engagers<br><br>
+        OCC เพิ่มจาก 5% → 10% — plan Promo Calendar ล่วงหน้า 2 เดือน
+        เช่น Back-to-School (Jul), Songkran (Apr 2027)
+      </div>
+    </div>
+    <div class="action-card">
+      <div class="action-num">03</div>
+      <div class="action-tag"><span class="badge badge-blue">ภายใน 1 เดือน</span></div>
+      <div class="action-title">Shift Creative Mix + แยก BRD Reporting</div>
+      <div class="action-body">
+        VDO → Album: เปลี่ยน KOL VDO เป็น Album โดยใช้ still frames + text overlay<br>
+        Target: Album ≥ 65%, VDO ≤ 20%<br><br>
+        แยก BRD campaign ออกจาก Performance report
+        ใช้ KPI: Reach ≥ 1.5M/mo และ CPM ≤ ฿35 สำหรับ BRD แทน ROAS
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;">
+    <div class="section-head">Key Insights Summary</div>
+    <div class="grid-2">
+      <div>
+        <div class="insight-box green" style="margin-bottom:8px;">
+          <strong>💡 AWO + OCC = Performance Core (17% Budget → 51% Revenue)</strong><br>
+          AWO 12% Budget ทำ ROAS 15.2x + OCC 5% Budget ทำ ROAS 8.4x — รวมกันใช้แค่ 17% แต่สร้าง Value สูงสุด
+        </div>
+        <div class="insight-box green" style="margin-bottom:8px;">
+          <strong>💡 BRD ไม่ได้แย่ — แค่วัดผลผิด KPI</strong><br>
+          BRD ROAS ต่ำเป็น expected เพราะ Awareness objective — ควรดูที่ Reach (avg 1.9M/mo active period) และ CPM ต่ำ ฿10–35 แทน
+        </div>
+      </div>
+      <div>
+        <div class="insight-box red" style="margin-bottom:8px;">
+          <strong>⚠️ KOL Budget ขยายเร็วเกินไปโดยไม่มี Creative System</strong><br>
+          Scale KOL จาก 13% → 50% ใน H2/2025 โดยไม่ rotate creative ทำให้ Audience เบื่อ ROAS ดิ่งจาก 5.7x → 0.45x ใน 9 เดือน
+        </div>
+        <div class="insight-box amber">
+          <strong>⚠️ SO Objective Change ต้องปรับ Reporting Framework</strong><br>
+          SO Mar 2026+ เปลี่ยนเป็น Reach obj — Purchase/ROAS ไม่ใช่ KPI หลักอีกต่อไป ทีมต้องไม่ alarm เมื่อเห็น SO Purchase ลด แต่ให้ดู Reach + CPM แทน
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .main -->
+
+<script>
+// ===== DATA =====
+const M = ['Jan25','Feb25','Mar25','Apr25','May25','Jun25','Jul25','Aug25','Sep25','Oct25','Nov25','Dec25','Jan26','Feb26','Mar26','Apr26'];
+const spend   = [288114,379417,263464,334451,405340,376079,437020,530456,625038,549535,698406,743586,578036,683731,733846,725524];
+const purch   = [174,559,314,282,275,271,460,453,413,419,447,622,642,398,387,283];
+const roasAll = [3.19,9.46,6.25,4.43,3.48,3.73,5.60,4.36,3.63,4.16,3.46,4.91,6.45,3.31,2.77,2.08];
+const cpmAll  = [23.7,31.2,25.3,27.7,29.5,20.5,22.1,25.8,35.5,34.5,32.1,24.8,21.6,29.1,31.6,16.9];
+const reachAll= [5427853,5156090,4806470,6006109,7138225,9003289,8021275,8062767,6454044,6281003,10269261,14023748,11042920,8994338,8509300,19541430];
+
+// By type spend
+const spAWO  = [43884,29766,44996,19763,21192,22292,39000,43122,46826,79335,123651,128135,123474,79984,91965,39730];
+const spKOL  = [24951,30357,40768,43780,48749,60827,145978,172067,295602,217476,260177,282399,244037,201118,264228,327359];
+const spSO   = [137656,120186,128452,155982,163489,112596,129902,156245,165793,181974,185384,165074,185460,218009,237090,154113];
+const spFS   = [38465,30329,36443,47347,55961,74530,65245,81720,68289,40928,23739,6745,0,95840,70759,47242];
+const spBRD  = [0,0,1487,61923,106816,96598,20371,36975,15215,7704,70085,86368,0,68945,42928,120633];
+const spOCC  = [43158,168779,11319,5657,9132,9236,32339,27176,14415,0,23348,60314,17261,1444,6630,23522];
+const spWEB  = [0,0,0,0,0,0,4184,12378,11992,12371,12023,12410,1645,17114,12138,3357];
+
+// Purchases by type
+const puAWO  = [78,203,142,140,136,94,159,174,141,233,239,252,300,147,149,59];
+const puKOL  = [4,14,32,36,35,65,91,97,72,59,82,147,149,61,24,34];
+const puSO   = [52,52,64,61,59,53,85,97,103,88,71,93,131,76,82,37];
+const puFS   = [22,20,25,29,35,54,69,56,77,27,6,5,1,63,58,38];
+const puBRD  = [0,0,3,9,10,4,0,3,1,0,6,5,0,39,32,45];
+const puOCC  = [18,270,48,7,0,1,56,14,15,0,36,115,52,3,8,52];
+
+// AWO monthly ROAS
+const roasAWO= [11.0,42.7,18.7,38.3,32.2,20.5,22.7,20.4,16.3,16.0,9.9,11.7,14.3,10.5,9.2,8.9];
+// OCC monthly ROAS
+const roasOCC= [1.89,10.71,22.38,4.50,0,0.43,6.72,2.49,6.03,null,9.24,11.18,19.17,5.07,3.99,13.76];
+// KOL_SO ROAS
+const roasKSOmo= [0.32,2.83,3.65,5.07,3.47,5.73,3.59,2.73,1.61,1.35,1.82,3.25,3.51,2.23,0.66,0.45];
+// SO Reach
+const soReach= [2957566,2709900,2580047,2919956,2755293,1678301,1885989,2056109,1265206,1457475,1351136,1356470,1822131,1807020,2417405,4843562];
+const soPurch= [52,52,64,61,59,53,85,97,103,88,71,93,131,76,82,37];
+
+const C = {
+  brand:'#F26522',brandF:'rgba(242,101,34,0.15)',
+  green:'#2D8A5E',greenF:'rgba(45,138,94,0.15)',
+  red:'#C04040',redF:'rgba(192,64,64,0.15)',
+  blue:'#3A6EA8',blueF:'rgba(58,110,168,0.15)',
+  amber:'#C07820',amberF:'rgba(192,120,32,0.15)',
+  purple:'#6B4E9B',purpleF:'rgba(107,78,155,0.15)',
+  teal:'#1E7E78',tealF:'rgba(30,126,120,0.15)',
+  ink3:'#8A7A74',
+};
+
+// ===== MAIN CHART =====
+let mainCI = null;
+function switchMain(type, btn) {
+  document.querySelectorAll('#sec-overview .inner-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(mainCI){mainCI.destroy();mainCI=null;}
+  const leg=document.getElementById('main-leg');
+  const ins=document.getElementById('main-ins');
+  const ctx=document.getElementById('mainChart').getContext('2d');
+
+  const xScale={ticks:{autoSkip:false,maxRotation:45,font:{size:9}},grid:{display:false}};
+  const yGrid={color:'rgba(0,0,0,0.05)'};
+
+  if(type==='spend'){
+    leg.innerHTML=`<span class="leg-item"><span class="leg-dot" style="background:#B5D4F4"></span>Spend (฿)</span><span class="leg-item"><span class="leg-dot leg-circle" style="background:${C.green}"></span>Purchases (qty)</span>`;
+    ins.innerHTML=`<strong>Trend:</strong> Spend เพิ่มต่อเนื่องจาก ฿263K (Mar25) → ฿744K (Dec25). Dec25 Peak: 622 purchases. Apr26 Purchase drop: KOL saturation + SO Objective shift`;
+    mainCI=new Chart(ctx,{data:{labels:M,datasets:[
+      {type:'bar',label:'Spend',data:spend,backgroundColor:'#B5D4F4',yAxisID:'y',order:2},
+      {type:'line',label:'Purchases',data:purch,borderColor:C.green,backgroundColor:C.green,pointRadius:4,yAxisID:'y2',order:1,tension:.3}
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{position:'left',ticks:{callback:v=>'฿'+Math.round(v/1000)+'K',font:{size:10}},grid:yGrid},
+        y2:{position:'right',grid:{display:false},ticks:{font:{size:10}}},x:xScale},
+      plugins:{legend:{display:false}}}});
+  } else if(type==='roas'){
+    leg.innerHTML=`<span class="leg-item"><span class="leg-dot" style="background:${C.green}"></span>ROAS</span><span class="leg-item"><span class="leg-dash" style="background:${C.red}"></span>Target 3.5x</span>`;
+    ins.innerHTML=`<strong>ROAS Downtrend:</strong> Feb25 สูงสุด 9.46x ลดลงต่อเนื่อง. 4 เดือนล่าสุด (Jan–Apr 26) ต่ำกว่า Target 3.5x ยกเว้น Jan26. Apr26 ต่ำสุด 2.08x`;
+    mainCI=new Chart(ctx,{type:'line',data:{labels:M,datasets:[
+      {label:'ROAS',data:roasAll,borderColor:C.green,backgroundColor:C.greenF,fill:true,tension:.3,pointRadius:4,
+        pointBackgroundColor:roasAll.map(r=>r>=3.5?C.green:C.red)},
+      {label:'3.5x',data:Array(16).fill(3.5),borderColor:C.red,borderDash:[4,4],pointRadius:0,borderWidth:1.5}
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{ticks:{callback:v=>v+'x',font:{size:10}},grid:yGrid},x:xScale},
+      plugins:{legend:{display:false}}}});
+  } else if(type==='reach'){
+    leg.innerHTML=`<span class="leg-item"><span class="leg-dot" style="background:${C.teal}"></span>Total Reach</span><span class="leg-item"><span class="leg-dot" style="background:${C.purple}"></span>BRD Reach</span>`;
+    ins.innerHTML=`<strong>Reach Spike Apr26:</strong> พุ่งถึง 19.5M — เกิดจาก SO + BRD ใช้ Reach objective. BRD Reach สูงสุดใน Apr26 (8.1M) สอดคล้องกับ BRD spend ที่เพิ่มขึ้น. ควรเก็บ Reach เป็น KPI หลักของ BRD`;
+    const brdReach=[0,0,29119,1193198,2250318,4741979,875882,1542752,800129,77043,2248392,3093344,0,914813,671785,8137340];
+    mainCI=new Chart(ctx,{type:'line',data:{labels:M,datasets:[
+      {label:'Total Reach',data:reachAll,borderColor:C.teal,backgroundColor:C.tealF,fill:true,tension:.3,pointRadius:4},
+      {label:'BRD Reach',data:brdReach,borderColor:C.purple,borderDash:[3,3],pointRadius:3,tension:.3,borderWidth:1.5}
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{ticks:{callback:v=>(v/1000000).toFixed(1)+'M',font:{size:10}},grid:yGrid},x:xScale},
+      plugins:{legend:{display:false}}}});
+  } else if(type==='cpm'){
+    leg.innerHTML=`<span class="leg-item"><span class="leg-dot" style="background:${C.amber}"></span>CPM (weighted avg)</span>`;
+    ins.innerHTML=`<strong>CPM Pattern:</strong> ขึ้นสูงใน Sep–Oct25 (~฿35) แต่ลดลงใน Q4. Apr26 ต่ำสุด ฿16.9 — น่าจะเป็นผลจาก Reach objective ใน SO ที่ optimize ไปที่ Volume ไม่ใช่ Conversion`;
+    mainCI=new Chart(ctx,{type:'line',data:{labels:M,datasets:[
+      {label:'CPM',data:cpmAll,borderColor:C.amber,backgroundColor:C.amberF,fill:true,tension:.3,pointRadius:4}
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{ticks:{callback:v=>'฿'+v,font:{size:10}},grid:yGrid},x:xScale},
+      plugins:{legend:{display:false}}}});
+  } else {
+    leg.innerHTML=`<span class="leg-item"><span class="leg-dot" style="background:${C.green}"></span>AWO</span><span class="leg-item"><span class="leg-dot" style="background:${C.amber}"></span>KOL</span><span class="leg-item"><span class="leg-dot" style="background:${C.brand}"></span>SO</span><span class="leg-item"><span class="leg-dot" style="background:${C.blue}"></span>FS</span><span class="leg-item"><span class="leg-dot" style="background:${C.purple}"></span>BRD</span><span class="leg-item"><span class="leg-dot" style="background:${C.teal}"></span>OCC</span>`;
+    ins.innerHTML=`<strong>KOL Budget Creep:</strong> H1/25 KOL เฉลี่ย ฿41K/เดือน → H2/25 เฉลี่ย ฿242K/เดือน กระโดด 5.9x ใน 6 เดือน. AWO ยังคง underfunded ตลอด 16 เดือนทั้งที่ให้ผลดีที่สุด`;
+    mainCI=new Chart(ctx,{type:'bar',data:{labels:M,datasets:[
+      {label:'AWO',data:spAWO,backgroundColor:C.green,stack:'s'},
+      {label:'KOL',data:spKOL,backgroundColor:C.amber,stack:'s'},
+      {label:'SO',data:spSO,backgroundColor:C.brand,stack:'s'},
+      {label:'FS',data:spFS,backgroundColor:C.blue,stack:'s'},
+      {label:'BRD',data:spBRD,backgroundColor:C.purple,stack:'s'},
+      {label:'OCC',data:spOCC,backgroundColor:C.teal,stack:'s'},
+      {label:'WEB',data:spWEB,backgroundColor:C.ink3,stack:'s'},
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{stacked:true,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K',font:{size:10}},grid:yGrid},
+        x:{stacked:true,ticks:{autoSkip:false,maxRotation:45,font:{size:9}},grid:{display:false}}},
+      plugins:{legend:{display:false}}}});
+  }
+}
+
+// Init main
+const ctx0=document.getElementById('mainChart').getContext('2d');
+mainCI=new Chart(ctx0,{data:{labels:M,datasets:[
+  {type:'bar',label:'Spend',data:spend,backgroundColor:'#B5D4F4',yAxisID:'y',order:2},
+  {type:'line',label:'Purchases',data:purch,borderColor:C.green,backgroundColor:C.green,pointRadius:4,yAxisID:'y2',order:1,tension:.3}
+]},options:{responsive:true,maintainAspectRatio:false,
+  scales:{y:{position:'left',ticks:{callback:v=>'฿'+Math.round(v/1000)+'K',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+    y2:{position:'right',grid:{display:false},ticks:{font:{size:10}}},
+    x:{ticks:{autoSkip:false,maxRotation:45,font:{size:9}},grid:{display:false}}},
+  plugins:{legend:{display:false}}}});
+
+// Objective donut
+new Chart(document.getElementById('objChart').getContext('2d'),{
+  type:'doughnut',
+  data:{labels:['Engagement (88%)','Awareness (10%)','Traffic (2%)','Sales (<1%)'],
+    datasets:[{data:[7348135,814983,165797,23127],backgroundColor:[C.brand,C.red,C.blue,C.ink3],borderWidth:0,hoverOffset:8}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+    plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8,boxWidth:10}}}}});
+
+// Campaign type stacked
+new Chart(document.getElementById('ctStackChart').getContext('2d'),{
+  data:{labels:M,datasets:[
+    {type:'bar',label:'AWO',data:puAWO,backgroundColor:C.green,stack:'p',yAxisID:'y'},
+    {type:'bar',label:'KOL',data:puKOL,backgroundColor:C.amber,stack:'p',yAxisID:'y'},
+    {type:'bar',label:'SO',data:puSO,backgroundColor:C.brand,stack:'p',yAxisID:'y'},
+    {type:'bar',label:'FS',data:puFS,backgroundColor:C.blue,stack:'p',yAxisID:'y'},
+    {type:'bar',label:'OCC',data:puOCC,backgroundColor:C.teal,stack:'p',yAxisID:'y'},
+    {type:'line',label:'ROAS',data:roasAll,borderColor:C.red,borderWidth:2,pointRadius:3,yAxisID:'y2',tension:.3},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{position:'left',stacked:true,ticks:{font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+      y2:{position:'right',grid:{display:false},ticks:{callback:v=>v+'x',font:{size:10}},min:0,max:12},
+      x:{stacked:true,ticks:{autoSkip:false,maxRotation:45,font:{size:9}},grid:{display:false}}},
+    plugins:{legend:{display:false}}}});
+
+// SO Reach chart
+new Chart(document.getElementById('soReachChart').getContext('2d'),{
+  data:{labels:M,datasets:[
+    {type:'bar',label:'SO Reach',data:soReach,backgroundColor:M.map((_,i)=>i>=14?C.tealF.replace('0.15','0.5'):'rgba(58,110,168,0.3)'),yAxisID:'y'},
+    {type:'line',label:'SO Purchases',data:soPurch,borderColor:C.brand,pointRadius:4,yAxisID:'y2',tension:.3,borderWidth:2},
+    {type:'line',label:'Objective change',data:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,4000000,null],
+      pointStyle:'triangle',pointRadius:10,pointBackgroundColor:C.teal,borderWidth:0,yAxisID:'y',showLine:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{position:'left',ticks:{callback:v=>(v/1000000).toFixed(1)+'M',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+      y2:{position:'right',grid:{display:false},ticks:{font:{size:10}}},
+      x:{ticks:{autoSkip:false,maxRotation:45,font:{size:9}},grid:{display:false}}},
+    plugins:{legend:{display:false},
+      annotation:{annotations:{line1:{type:'line',xMin:'Mar26',xMax:'Mar26',borderColor:C.teal,borderWidth:1.5,borderDash:[4,4]}}}}}});
+
+// AWO chart
+new Chart(document.getElementById('awoChart').getContext('2d'),{
+  data:{labels:M,datasets:[
+    {type:'bar',label:'AWO Spend',data:spAWO,backgroundColor:'rgba(45,138,94,0.3)',yAxisID:'y'},
+    {type:'line',label:'AWO ROAS',data:roasAWO,borderColor:C.green,pointRadius:4,yAxisID:'y2',tension:.3,borderWidth:2}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{position:'left',ticks:{callback:v=>'฿'+Math.round(v/1000)+'K',font:{size:9}},grid:{color:'rgba(0,0,0,0.05)'}},
+      y2:{position:'right',grid:{display:false},ticks:{callback:v=>v+'x',font:{size:9}}},
+      x:{ticks:{autoSkip:false,maxRotation:45,font:{size:9}},grid:{display:false}}},
+    plugins:{legend:{display:false}}}});
+
+// OCC chart
+new Chart(document.getElementById('occChart').getContext('2d'),{
+  data:{labels:M,datasets:[
+    {type:'bar',label:'OCC Spend',data:spOCC,backgroundColor:'rgba(30,126,120,0.3)',yAxisID:'y'},
+    {type:'line',label:'OCC ROAS',data:roasOCC,borderColor:C.teal,pointRadius:4,yAxisID:'y2',tension:.3,borderWidth:2,
+      spanGaps:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{position:'left',ticks:{callback:v=>'฿'+Math.round(v/1000)+'K',font:{size:9}},grid:{color:'rgba(0,0,0,0.05)'}},
+      y2:{position:'right',grid:{display:false},ticks:{callback:v=>v+'x',font:{size:9}},min:0},
+      x:{ticks:{autoSkip:false,maxRotation:45,font:{size:9}},grid:{display:false}}},
+    plugins:{legend:{display:false}}}});
+
+// KOL decline chart
+new Chart(document.getElementById('kolChart').getContext('2d'),{
+  data:{labels:M,datasets:[
+    {type:'bar',label:'KOL_SO Spend',data:spKOL,backgroundColor:'rgba(192,120,32,0.3)',yAxisID:'y'},
+    {type:'line',label:'KOL_SO ROAS',data:roasKSOmo,borderColor:C.red,pointRadius:5,yAxisID:'y2',tension:.3,borderWidth:2.5,
+      pointBackgroundColor:roasKSOmo.map(r=>r>=3?C.green:r>=1.5?C.amber:C.red)},
+    {type:'line',label:'Target 3x',data:Array(16).fill(3),borderColor:C.green,borderDash:[4,4],pointRadius:0,borderWidth:1.5,yAxisID:'y2'}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{position:'left',ticks:{callback:v=>'฿'+Math.round(v/1000)+'K',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+      y2:{position:'right',grid:{display:false},ticks:{callback:v=>v+'x',font:{size:10}},min:0,max:7},
+      x:{ticks:{autoSkip:false,maxRotation:45,font:{size:9}},grid:{display:false}}},
+    plugins:{legend:{display:false}}}});
+
+// ===== SEASONAL CHART =====
+let seasonCI = null;
+function switchSeason(type, btn) {
+  document.querySelectorAll('#sec-seasonal .inner-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(seasonCI){seasonCI.destroy();seasonCI=null;}
+  const ctx=document.getElementById('seasonChart').getContext('2d');
+  const ins=document.getElementById('season-ins');
+  const xScale={ticks:{autoSkip:false,maxRotation:45,font:{size:9}},grid:{display:false}};
+  const yGrid={color:'rgba(0,0,0,0.05)'};
+
+  if(type==='mom'){
+    // MoM % change purchases
+    const momP=purch.map((v,i)=>i===0?null:Math.round((v-purch[i-1])/purch[i-1]*100));
+    const momS=spend.map((v,i)=>i===0?null:Math.round((v-spend[i-1])/spend[i-1]*100));
+    ins.innerHTML=`<strong>MoM Insight:</strong> Feb25 spike +221% (OCC promo burst). May/Jun เป็น Natural Low Season (-18% avg). Jul กลับมา +70%. Dec peak +39%. Feb→Mar 2026 ROAS ยังลดต่อเนื่องสวนทาง spend ที่เพิ่ม`;
+    seasonCI=new Chart(ctx,{type:'bar',data:{labels:M.slice(1),datasets:[
+      {label:'Purchase MoM%',data:momP.slice(1),backgroundColor:momP.slice(1).map(v=>v>=0?'rgba(45,138,94,0.6)':'rgba(192,64,64,0.6)'),yAxisID:'y'},
+      {label:'Spend MoM%',data:momS.slice(1),borderColor:C.blue,type:'line',pointRadius:3,yAxisID:'y',tension:.3,borderWidth:1.5,fill:false}
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{ticks:{callback:v=>v+'%',font:{size:10}},grid:yGrid},x:xScale},
+      plugins:{legend:{display:false}}}});
+
+  } else if(type==='half'){
+    // H1 vs H2 by month position (bar side-by-side)
+    const h1months=['Jan','Feb','Mar','Apr','May','Jun'];
+    const h1p25=[174,559,314,282,275,271];
+    const h2p25=[460,453,413,419,447,622];
+    const h1r25=[3.19,9.46,6.25,4.43,3.48,3.73];
+    const h2r25=[5.60,4.36,3.63,4.16,3.46,4.91];
+    ins.innerHTML=`<strong>H1 vs H2 Pattern 2025:</strong> H2 มี Purchase สูงกว่าทุกเดือน (Jul > Jan เสมอ) แต่ ROAS H2 ต่ำกว่า H1 ยกเว้น Jul–Aug เพราะ KOL scale-up ใน Sep–Dec drag ROAS ลง. Dec เป็น outlier ที่ดี`;
+    seasonCI=new Chart(ctx,{data:{labels:h1months,datasets:[
+      {type:'bar',label:'H1 2025 Purchases',data:h1p25,backgroundColor:'rgba(58,110,168,0.5)',yAxisID:'y'},
+      {type:'bar',label:'H2 2025 Purchases',data:h2p25,backgroundColor:'rgba(242,101,34,0.5)',yAxisID:'y'},
+      {type:'line',label:'H1 ROAS',data:h1r25,borderColor:C.blue,pointRadius:4,yAxisID:'y2',tension:.2,borderWidth:2,borderDash:[4,4]},
+      {type:'line',label:'H2 ROAS',data:h2r25,borderColor:C.brand,pointRadius:4,yAxisID:'y2',tension:.2,borderWidth:2},
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{position:'left',ticks:{font:{size:10}},grid:yGrid},
+        y2:{position:'right',grid:{display:false},ticks:{callback:v=>v+'x',font:{size:10}},min:0,max:12},
+        x:{ticks:{font:{size:10}},grid:{display:false}}},
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8,boxWidth:10}}}}});
+
+  } else {
+    // YoY Jan-Apr
+    const labels25=['Jan 2025','Feb 2025','Mar 2025','Apr 2025'];
+    const labels26=['Jan 2026','Feb 2026','Mar 2026','Apr 2026'];
+    const p25=[174,559,314,282]; const p26=[642,398,387,283];
+    const r25=[3.19,9.46,6.25,4.43]; const r26=[6.45,3.31,2.77,2.08];
+    ins.innerHTML=`<strong>YoY Jan–Apr:</strong> 2026 Purchase +29% (1,710 vs 1,329) แต่ Spend +115% — ROAS เฉลี่ย ลดจาก 5.84x → 3.65x. Feb ถดถอยชัดสุด: Purchase ลด -29% พร้อม ROAS ลด -65%`;
+    seasonCI=new Chart(ctx,{data:{labels:['January','February','March','April'],datasets:[
+      {type:'bar',label:'Purchases 2025',data:p25,backgroundColor:'rgba(58,110,168,0.5)',yAxisID:'y'},
+      {type:'bar',label:'Purchases 2026',data:p26,backgroundColor:'rgba(242,101,34,0.5)',yAxisID:'y'},
+      {type:'line',label:'ROAS 2025',data:r25,borderColor:C.blue,pointRadius:5,yAxisID:'y2',tension:.2,borderWidth:2,borderDash:[4,4]},
+      {type:'line',label:'ROAS 2026',data:r26,borderColor:C.brand,pointRadius:5,yAxisID:'y2',tension:.2,borderWidth:2},
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{position:'left',ticks:{font:{size:10}},grid:yGrid},
+        y2:{position:'right',grid:{display:false},ticks:{callback:v=>v+'x',font:{size:10}},min:0,max:12},
+        x:{ticks:{font:{size:10}},grid:{display:false}}},
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8,boxWidth:10}}}}});
+  }
+}
+
+// Init seasonal
+const ctxS=document.getElementById('seasonChart').getContext('2d');
+const momP=purch.map((v,i)=>i===0?null:Math.round((v-purch[i-1])/purch[i-1]*100));
+const momS=spend.map((v,i)=>i===0?null:Math.round((v-spend[i-1])/spend[i-1]*100));
+seasonCI=new Chart(ctxS,{type:'bar',data:{labels:M.slice(1),datasets:[
+  {label:'Purchase MoM%',data:momP.slice(1),backgroundColor:momP.slice(1).map(v=>v>=0?'rgba(45,138,94,0.6)':'rgba(192,64,64,0.6)'),yAxisID:'y'},
+  {label:'Spend MoM%',data:momS.slice(1),borderColor:C.blue,type:'line',pointRadius:3,yAxisID:'y',tension:.3,borderWidth:1.5,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,
+  scales:{y:{ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+    x:{ticks:{autoSkip:false,maxRotation:45,font:{size:9}},grid:{display:false}}},
+  plugins:{legend:{display:false}}}});
+
+// ===== NAV =====
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
